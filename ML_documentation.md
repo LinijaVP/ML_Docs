@@ -305,13 +305,30 @@ if useGbm:
     predictions = gbm.predict(test)
 ```
 ## Catboost
+```
 if useCatboost:
     catboost_model = CatBoostRegressor(iterations=1000,eval_metric='RMSE', verbose=100)
 
     catboost_model.fit(X_train, y_train, eval_set=(X_valid, y_valid))
     predictions = catboost_model.predict(test)
+```
+## Logistic regression
+```
+logreg = LogisticRegression()
 
+param_grid = {
+    'penalty': ['l1', 'l2', 'elasticnet', 'None'],
+    'C': [0.01, 0.1, 1, 10, 100],  
+    'solver': ['liblinear', 'saga'], 
+    'max_iter': [500, 750, 1000]
+}
+
+grid_search = GridSearchCV(logreg, param_grid, cv=5, verbose=0, n_jobs=-1)
+grid_search.fit(X, y)
+predictions = grid_search.best_estimator_.predict(X_test)
+```
 # Exports
+```
 out = pd.DataFrame({
     'id': test_id,
     'class': predictions
@@ -319,3 +336,4 @@ out = pd.DataFrame({
 
 out.to_csv('submission.csv', index=False)
 print("Submission file created: submission.csv")
+```
